@@ -24,7 +24,7 @@ print("Compile time:", (end_time-begin_time) / 1e9)
 
 print('Reading data from csv... ', end = '')
 FILENAME_PATH = 'C:\\Users\\maxel\\OneDrive\\Machine_learning\\Stock forecaster\\Datasets\\'
-df = pd.read_csv(FILENAME_PATH + "EURUSD_scaled.csv")
+df = pd.read_csv(FILENAME_PATH + "EURUSD_scaled_smallcdcd.csv")
 
 data_input = df[['HIGH','LOW','OPEN','CLOSE']][:-1].to_numpy()
 data_output = df[['HIGH','LOW','OPEN','CLOSE']][1:].to_numpy()
@@ -38,12 +38,11 @@ print('Done')
 # ------------------------------ Simple train ------------------------------ #
 
 # Split the data - 60% train, 20% validate, 20% test
-np.random.seed(420)
-train_input, validate_input, test_input = h.kfold(5, data_input, random_seed)
-train_output, validate_output, test_output = h.kfold(5, data_output, random_seed)
+train_input, validate_input, test_input = h.kfold(5, data_input)
+train_output, validate_output, test_output = h.kfold(5, data_output)
 
 nn_values = nn.make_neural_network(layer_sizes=[train_input.shape[1], 20, train_output.shape[1]],
-                                   layer_activations=[h.sigmoid, h.softmax])
+                                   layer_activations=[h.sigmoid, h.identity])
 
 begin_time = time.time_ns()
 epochs, current_mse = nn.train_auto(train_input, train_output, validate_input, validate_output, nn_values)
@@ -52,9 +51,11 @@ end_time = time.time_ns()
 train_mse = nn.calculate_MSE(train_input, train_output, nn_values)
 test_mse = nn.calculate_MSE(test_input, test_output, nn_values)
 
-accuracy_test = nn.evaluate(test_input, test_output, nn_values)
-total_accuracy += accuracy_test
-print("Seed:", random_seed, "Epochs:", epochs, "Time:", (end_time-begin_time)/1e9, "Accuracy:", accuracy_test, "Tr:", train_mse, "V:", current_mse, "T:", test_mse)
+print("Epochs:", epochs, 
+      "Time:", (end_time-begin_time)/1e9, 
+      "Tr:", train_mse,
+      "V:", current_mse, 
+      "T:", test_mse)
 
 
 # ----------------------------- Evaluation loop ----------------------------- #

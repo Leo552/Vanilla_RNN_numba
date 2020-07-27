@@ -67,7 +67,7 @@ def make_neural_network(layer_sizes, layer_activations,recurrent_layers, learnin
         typed_layer_outputs.append(np.zeros((layer_sizes[i], 1)))
 
     typed_learning_rate = learning_rate
-    return NeuralNetwork(typed_layer_sizes, typed_layer_activations, typed_weights, typed_biases, typed_layer_outputs, typed_learning_rate)
+    return NeuralNetwork(typed_layer_sizes, typed_layer_activations, typed_recurrent_layers, typed_weights, typed_biases, typed_layer_outputs, typed_learning_rate)
 
 
 @njit

@@ -24,7 +24,7 @@ print("Compile time:", (end_time-begin_time) / 1e9)
 
 print('Reading data from csv... ', end = '')
 FILENAME_PATH = 'C:\\Users\\maxel\\OneDrive\\Machine_learning\\Stock forecaster\\Datasets\\'
-df = pd.read_csv(FILENAME_PATH + "EURUSD_scaled_smallcdcd.csv")
+df = pd.read_csv(FILENAME_PATH + "EURUSD_scaled_small.csv")
 
 data_input = df[['HIGH','LOW','OPEN','CLOSE']][:-1].to_numpy()
 data_output = df[['HIGH','LOW','OPEN','CLOSE']][1:].to_numpy()
@@ -38,6 +38,7 @@ print('Done')
 # ------------------------------ Simple train ------------------------------ #
 
 # Split the data - 60% train, 20% validate, 20% test
+np.random.seed(420)
 train_input, validate_input, test_input = h.kfold(5, data_input)
 train_output, validate_output, test_output = h.kfold(5, data_output)
 

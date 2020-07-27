@@ -14,7 +14,7 @@ s = 1
 
 print('Compiling...')
 begin_time = time.time_ns()
-compiled_nn_values = nn.make_neural_network(layer_sizes=[s,s], layer_activations=[h.softmax])
+compiled_nn_values = nn.make_neural_network(layer_sizes=[s,s], layer_activations=[h.softmax], recurrent_layers = [False])
 nn.train_auto(d,d,d,d, compiled_nn_values)
 end_time = time.time_ns()
 print("Compile time:", (end_time-begin_time) / 1e9)
@@ -44,7 +44,8 @@ train_output, validate_output, test_output = h.kfold(5, data_output)
 print('Data split')
 
 nn_values = nn.make_neural_network(layer_sizes=[train_input.shape[1], 20, train_output.shape[1]],
-                                   layer_activations=[h.sigmoid, h.identity])
+                                   layer_activations=[h.sigmoid, h.identity],
+                                   recurrent_layers = [False, False])
 print('Values types compiled')
 begin_time = time.time_ns()
 epochs, current_mse = nn.train_auto(train_input, train_output, validate_input, 
@@ -74,7 +75,9 @@ for i in range(n):
     train_input, validate_input, test_input = h.kfold(7, data_input, random_seed)
     train_output, validate_output, test_output = h.kfold(7, data_output, random_seed)
 
-    nn_values = nn.make_neural_network(layer_sizes=[train_input.shape[1], 20, train_output.shape[1]], layer_activations=[h.sigmoid, h.identity])
+    nn_values = nn.make_neural_network(layer_sizes=[train_input.shape[1], 20, train_output.shape[1]],
+                                       layer_activations=[h.sigmoid, h.identity],
+                                       recurrent_layers = [False, False])
 
     begin_time = time.time_ns()
     epochs, current_mse = nn.train_auto(train_input, train_output, validate_input, validate_output, nn_values)

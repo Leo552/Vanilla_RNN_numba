@@ -12,6 +12,7 @@ warnings.simplefilter('ignore', category=NumbaTypeSafetyWarning)
 spec = [
     ("layer_sizes", types.ListType(types.int64)),
     ("layer_activations", types.ListType(types.FunctionType(types.float64[:, ::1](types.float64[:, ::1], types.boolean)))),
+    ("recurrent_layers", types.ListType(types.boolean)),
     ("weights", types.ListType(types.float64[:, ::1])),
     ("biases", types.ListType(types.float64[:, ::1])),
     ("layer_outputs", types.ListType(types.float64[:, ::1])),
@@ -19,16 +20,18 @@ spec = [
 ]
 @jitclass(spec)
 class NeuralNetwork:
-    def __init__(self, layer_sizes, layer_activations, weights, biases, layer_outputs, learning_rate):
+    def __init__(self, layer_sizes, layer_activations, recurrent_layers, weights, 
+                 biases, layer_outputs, learning_rate):
         self.layer_sizes = layer_sizes
         self.layer_activations = layer_activations
+        self.recurrent_layers = recurrent_layers
         self.weights = weights
         self.biases = biases
         self.layer_outputs = layer_outputs
         self.learning_rate = learning_rate
 
 
-def make_neural_network(layer_sizes, layer_activations, learning_rate=0.01, low=-2, high=2):
+def make_neural_network(layer_sizes, layer_activations,recurrent_layers, learning_rate=0.01, low=-2, high=2):
     for size in layer_sizes:
         assert size > 0
 
@@ -36,34 +39,35 @@ def make_neural_network(layer_sizes, layer_activations, learning_rate=0.01, low=
     typed_layer_sizes = typed.List()
     for size in layer_sizes:
         typed_layer_sizes.append(size)
-    # print(typeof(typed_layer_sizes))
 
     # Initialie typed layer activation method strings list.
     prototype = types.FunctionType(types.float64[:, ::1](types.float64[:, ::1], types.boolean))
     typed_layer_activations = typed.List.empty_list(prototype)
     for activation in layer_activations:
         typed_layer_activations.append(activation)
+        
+    # Initialize typed recurrent layers.
+    typed_recurrent_layers = typed.List()
+    for val in recurrent_layers:
+        typed_recurrent_layers.append(val)
 
     # Initialize weights between every neuron in all adjacent layers.
     typed_weights = typed.List()
     for i in range(1, len(layer_sizes)):
         typed_weights.append(np.random.uniform(low, high, (layer_sizes[i-1], layer_sizes[i])))
-    # print(typeof(typed_weights))
 
     # Initialize biases for every neuron in all layers
     typed_biases = typed.List()
     for i in range(1, len(layer_sizes)):
         typed_biases.append(np.random.uniform(low, high, (layer_sizes[i], 1)))
-    # print(typeof(typed_biases))
 
     # Initialize empty list of output of every neuron in all layers.
     typed_layer_outputs = typed.List()
     for i in range(len(layer_sizes)):
         typed_layer_outputs.append(np.zeros((layer_sizes[i], 1)))
-    # print(typeof(typed_layer_outputs))
 
     typed_learning_rate = learning_rate
-    return NeuralNetwork(typed_layer_sizes, typed_layer_activations, typed_weights, typed_biases, typed_layer_outputs, typed_learning_rate)
+    return NeuralNetwork(typed_layer_sizes, typed_layer_activations, typed_recurrent_layers, typed_weights, typed_biases, typed_layer_outputs, typed_learning_rate)
 
 
 @njit

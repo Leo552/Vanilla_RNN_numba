@@ -23,7 +23,7 @@ print("Compile time:", (end_time-begin_time) / 1e9)
 # ----------------------------- Import the data ----------------------------- #
 
 print('Reading data from csv... ', end = '')
-FILENAME_PATH = 'C:\\Users\\maxel\\OneDrive\\Machine_learning\\Stock forecaster\\Datasets\\'
+FILENAME_PATH = 'C:\\Users\\maxel\\OneDrive\\Machine_learning\\Stock forecaster\\Vanilla_RNN_numba\\Datasets\\'
 df = pd.read_csv(FILENAME_PATH + "EURUSD_scaled_small.csv")
 
 data_input = df[['HIGH','LOW','OPEN','CLOSE']][:-1].to_numpy()
@@ -41,12 +41,14 @@ print('Done')
 np.random.seed(420)
 train_input, validate_input, test_input = h.kfold(5, data_input)
 train_output, validate_output, test_output = h.kfold(5, data_output)
+print('Data split')
 
 nn_values = nn.make_neural_network(layer_sizes=[train_input.shape[1], 20, train_output.shape[1]],
                                    layer_activations=[h.sigmoid, h.identity])
-
+print('Values types compiled')
 begin_time = time.time_ns()
-epochs, current_mse = nn.train_auto(train_input, train_output, validate_input, validate_output, nn_values)
+epochs, current_mse = nn.train_auto(train_input, train_output, validate_input, 
+                                    validate_output, nn_values, 1000)
 end_time = time.time_ns()
 
 train_mse = nn.calculate_MSE(train_input, train_output, nn_values)

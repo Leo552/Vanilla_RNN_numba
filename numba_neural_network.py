@@ -28,7 +28,7 @@ class NeuralNetwork:
         self.learning_rate = learning_rate
 
 
-def make_neural_network(layer_sizes, layer_activations, learning_rate=0.05, low=-2, high=2):
+def make_neural_network(layer_sizes, layer_activations, learning_rate=0.01, low=-2, high=2):
     for size in layer_sizes:
         assert size > 0
 
@@ -124,16 +124,17 @@ def train_epoch(train_input_data, train_desired_output_data, validate_input_data
 
 
 @njit
-def train_auto(train_input_data, train_desired_output_data, validate_input_data, validate_output_data, nn):
+def train_auto(train_input_data, train_desired_output_data, validate_input_data, validate_output_data, nn, max_epochs = 1000):
     previous_mse = 1.0
     current_mse = 0.0
     epochs = 0
-    while(current_mse < previous_mse):
+    while(current_mse < previous_mse and epochs < max_epochs):
         epochs += 1
         previous_mse = calculate_MSE(validate_input_data, validate_output_data, nn)
         for i in range(len(train_input_data)):
             train_single(train_input_data[i], train_desired_output_data[i], nn)
         current_mse = calculate_MSE(validate_input_data, validate_output_data, nn)
+        print(current_mse)
     return epochs, current_mse
 
 

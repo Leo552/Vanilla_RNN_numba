@@ -64,7 +64,6 @@ print("Epochs:", epochs,
 # ----------------------------- Evaluation loop ----------------------------- #
 
 np.random.seed(420)
-total_accuracy = 0.0
 begin_total = time.time_ns()
 n = 10
 for i in range(n):
@@ -75,7 +74,7 @@ for i in range(n):
     train_input, validate_input, test_input = h.kfold(7, data_input, random_seed)
     train_output, validate_output, test_output = h.kfold(7, data_output, random_seed)
 
-    nn_values = nn.make_neural_network(layer_sizes=[train_input.shape[1], 20, train_output.shape[1]], layer_activations=[h.sigmoid, h.softmax])
+    nn_values = nn.make_neural_network(layer_sizes=[train_input.shape[1], 20, train_output.shape[1]], layer_activations=[h.sigmoid, h.identity])
 
     begin_time = time.time_ns()
     epochs, current_mse = nn.train_auto(train_input, train_output, validate_input, validate_output, nn_values)
@@ -84,7 +83,11 @@ for i in range(n):
     train_mse = nn.calculate_MSE(train_input, train_output, nn_values)
     test_mse = nn.calculate_MSE(test_input, test_output, nn_values)
 
-    accuracy_test = nn.evaluate(test_input, test_output, nn_values)
-    total_accuracy += accuracy_test
-    print("Seed:", random_seed, "Epochs:", epochs, "Time:", (end_time-begin_time)/1e9, "Accuracy:", accuracy_test, "Tr:", train_mse, "V:", current_mse, "T:", test_mse)
-print("Average Accuracy:", total_accuracy / n, "Average Time:", ((time.time_ns()-begin_total)/1e9) / n)
+    print("Seed:", random_seed,
+          "Epochs:", epochs,
+          "Time:", (end_time-begin_time)/1e9, 
+          "Tr:", train_mse,
+          "V:", current_mse,
+          "T:", test_mse)
+    
+print("Average Time:", ((time.time_ns()-begin_total)/1e9) / n)

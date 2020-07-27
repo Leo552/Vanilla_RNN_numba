@@ -47,3 +47,11 @@ def leaky_relu(x, derivative):
 def softmax(x, derivative):
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
+
+@njit('float64[:, ::1](float64[:, ::1], boolean)')
+def identity(x, derivative):
+    if derivative:
+        return np.full((x.shape), 1.0)
+    else:
+        return x
+    
